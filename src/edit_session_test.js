@@ -1242,6 +1242,16 @@ module.exports = {
         assert.equal(session.getValue(), "Hello world! test1 test2");
     },
 
+    "test: JSON deserialization of session without undo history": function() {
+        // sessions using the default no-op undo manager serialize
+        // history as {}; editing after restore should not throw
+        var session = new EditSession(["Hello world!"]);
+        session = EditSession.fromJSON(JSON.stringify(session));
+
+        session.insert({row: 0, column: 0}, "x");
+        assert.equal(session.getValue(), "xHello world!");
+    },
+
     "test: operation handling : when session it not attached to an editor": async function(done) {
         const session = new EditSession("Hello world!");
         const beforeEndOperationSpy = [];

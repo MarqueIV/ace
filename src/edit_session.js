@@ -337,10 +337,14 @@ class EditSession {
         if (typeof session == "string")
             session = JSON.parse(session);
         const undoManager = new UndoManager();
-        undoManager.$undoStack = session.history.$undoStack;
-        undoManager.$redoStack = session.history.$redoStack;
-        undoManager.mark = session.history.mark;
-        undoManager.$rev = session.history.rev;
+        // history may be empty, e.g. serialized from a session that used
+        // the default no-op undo manager
+        if (session.history) {
+            undoManager.$undoStack = session.history.$undoStack || [];
+            undoManager.$redoStack = session.history.$redoStack || [];
+            undoManager.mark = session.history.mark || 0;
+            undoManager.$rev = session.history.rev || 0;
+        }
 
         const editSession = new EditSession(session.value);
         session.folds.forEach(function(fold) {
